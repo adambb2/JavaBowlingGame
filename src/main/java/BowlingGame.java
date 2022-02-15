@@ -68,8 +68,8 @@ public class BowlingGame {
 		if(pins > maxPinCount) {
 			throw new IllegalStateException("Pin count exceeds pins on the lane");
 		}
-		//TODO: this should check that the 1stball + 2ndball in a frame are not greater than 10 (except on the 10th frame)
-		if(pins  > maxPinCount) {
+		//Check that the 1stball + 2ndball in a frame are not greater than MaxPinCount (except on the 10th frame)
+		if(getCurrentFrameNumber() != maxFrameCount && getCurrentFrame().getFirstBallPinCount() != null && (getCurrentFrame().getFirstBallPinCount() + pins)  > maxPinCount) {
 			throw new IllegalStateException("Pin count exceeds pins on the lane"); 
 		}
 		if(pins < 0) {
@@ -91,7 +91,6 @@ public class BowlingGame {
 	private Boolean checkStrikeFrame(Integer pins) {
 		//check for STRIKE on the 1st ball roll
 		if(pins == maxPinCount) {
-			getCurrentFrame().setFirstBallPinCount(pins);
 			System.out.println("Rolled a STRIKE on frame " + getCurrentFrameNumber().toString() + "! Moving to next frame.");
 			return true;
 		}
@@ -99,7 +98,7 @@ public class BowlingGame {
 	}
 	
 	private void setStrikeFrame(Integer pins) {
-		getCurrentFrame().setFirstBallPinCount(pins);
+		getCurrentFrame().setFirstBallPinCount(pins); //TODO: Change this to a setter in the Frame class which sets to current ballpincount (next non null) in the Frame. That way this works for 10th frame
 	}
 	
 	private Boolean checkSpareFrame(Integer pins) {
@@ -112,7 +111,7 @@ public class BowlingGame {
 	}
 	
 	private void setSpareFrame(Integer pins) {
-		getCurrentFrame().setSecondBallPinCount(pins);
+		getCurrentFrame().setSecondBallPinCount(pins); //TODO: Change this to a setter in the Frame class which sets to current ballpincount in the Frame. That way this works for 10th frame
 	}
 	
 	private Boolean checkOpenFrame(Integer pins) {
@@ -125,7 +124,7 @@ public class BowlingGame {
 	}
 	
 	private void setOpenFrame(Integer pins) {
-		getCurrentFrame().setSecondBallPinCount(pins);
+		getCurrentFrame().setSecondBallPinCount(pins); //TODO: Change this to a setter in the Frame class which sets to current ballpincount in the Frame. That way this works for 10th frame
 	}
 	
 }
