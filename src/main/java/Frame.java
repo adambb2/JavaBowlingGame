@@ -1,11 +1,11 @@
 
 public class Frame {
 	
-	private Integer firstBallPinCount = 0;
+	private Integer firstBallPinCount = null;
 	
-	private Integer secondBallPinCount = 0; //second ball only occurs if a strike was NOT rolled on the first ball..  OR if it is the 10th frame
+	private Integer secondBallPinCount = null; //second ball only occurs if a strike was NOT rolled on the first ball..  OR if it is the 10th frame
 	
-	private Integer fillBallPinCount = 0; //a fill ball is given if a strike of spare occurs on the 10th frame
+	private Integer fillBallPinCount = null; //a fill ball is given if a strike of spare occurs on the 10th frame
 
 	/**
 	 * @return the firstBallPinCount
@@ -58,6 +58,12 @@ public class Frame {
 		this.firstBallPinCount = firstBallPinCount;
 		this.secondBallPinCount = secondBallPinCount;
 		this.fillBallPinCount = fillBallPinCount;
+	}
+	
+	/**
+	 * default constructor
+	 */
+	public Frame() {
 	}
 	
 
