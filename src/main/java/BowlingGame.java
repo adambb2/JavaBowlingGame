@@ -45,7 +45,6 @@ public class BowlingGame {
 				//first ball roll was not a strike, continuing with current frame..
 				getCurrentFrame().setFirstBallPinCount(pins);
 			}		
-			
 		}
 		catch(IllegalStateException ex) {
 			System.out.println(ex.getMessage());
@@ -58,7 +57,16 @@ public class BowlingGame {
 	 * @return score
 	 */
 	public int score() {
-		return 1;
+		try {
+			if(gameComplete() != true) {
+				throw new IllegalStateException("Score cannot be taken until the end of the game"); 
+			}
+			return 1;
+		}
+		catch(IllegalStateException ex) {
+			System.out.println(ex.getMessage());
+			throw ex;
+		}
 	}
 	
 	
@@ -77,8 +85,7 @@ public class BowlingGame {
 		if(pins < 0) {
 			throw new IllegalStateException("Negative roll is invalid");
 		}
-		//trying to roll after the frames are up, the fill ball has already been rolled, or trying to roll a fill ball if it wasn't earned
-		if(getCurrentFrameNumber() > maxFrameCount || getCurrentFrame().getFillBallPinCount() != null || (getCurrentFrameNumber() == maxFrameCount && getCurrentFrame().firstAndSecondRollComplete() == true && fillBallEarned() == false)) {
+		if(gameComplete()) {
 			throw new IllegalStateException("Cannot roll after game is over");
 		}
 	}
@@ -160,6 +167,16 @@ public class BowlingGame {
 		}
 		return false;
 	}
+	
+	//trying to roll after the frames are up, the fill ball has already been rolled, or trying to roll a fill ball if it wasn't earned
+	public Boolean gameComplete() {
+		if(getCurrentFrameNumber() > maxFrameCount || getCurrentFrame().getFillBallPinCount() != null || (getCurrentFrameNumber() == maxFrameCount && getCurrentFrame().firstAndSecondRollComplete() == true && fillBallEarned() == false)) {
+			return true;
+		}
+		return false;
+	}
+	
+	
 	
 	
 }
