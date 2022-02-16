@@ -4,11 +4,15 @@ import java.util.List;
 
 public class BowlingGame {
 	
+	Integer score = 0;
+	
 	private Integer maxFrameCount = 10;
 	
 	private Integer maxPinCount = 10;
 	
-	private List<Frame> frameList = new ArrayList<Frame> ();
+	private List<Frame> frameList = new ArrayList<Frame>();
+	
+	private List<Integer> pinList = new ArrayList<Integer>();
 	
 	
 	
@@ -28,6 +32,7 @@ public class BowlingGame {
 	public void roll(Integer pins) {
 		try {
 			validateRoll(pins);
+			pinList.add(pins);
 			
 			if(checkStrikeFrame(pins)) {
 				setStrikeFrame(pins);
@@ -61,7 +66,25 @@ public class BowlingGame {
 			if(gameComplete() != true) {
 				throw new IllegalStateException("Score cannot be taken until the end of the game"); 
 			}
-			return 1;
+			else {
+				//TODO: index through the FRAMES LIST rather than the PINS LIST
+				for(int i = 0; i < pinList.size(); i++){
+				    score += pinList.get(i);
+					//strike extra points
+					if(pinList.get(i) == maxPinCount && i+1 <= pinList.size()){
+						score += pinList.get(i+1);
+					}
+					if(pinList.get(i) == maxPinCount && i+2 <= pinList.size()){
+						score += pinList.get(i+2);
+					}
+					//spare extra points
+					//TODO: this is going to incorrectly detect a spare when two frames such as this are side by side (3|6),(4|3) 
+					if(i+1 <= pinList.size() && pinList.get(i) == maxPinCount && (pinList.get(i) + pinList.get(i+1)) == maxPinCount){
+						score += pinList.get(i+1);
+					}
+				}
+				return score;
+			}
 		}
 		catch(IllegalStateException ex) {
 			System.out.println(ex.getMessage());
@@ -176,7 +199,9 @@ public class BowlingGame {
 		return false;
 	}
 	
+	//TODO: Method to get the next two non-null roll pin sum after a strike has occured
 	
+	//TODO: Method to get the next non-null roll pin after a spare has occured
 	
 	
 }
