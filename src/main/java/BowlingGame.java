@@ -89,7 +89,7 @@ public class BowlingGame {
 	}
 	
 	private Boolean checkStrikeFrame(Integer pins) {
-		//check for STRIKE on the 1st ball roll
+		//check for STRIKE
 		if(pins == maxPinCount) {
 			System.out.println("Rolled a STRIKE on frame " + getCurrentFrameNumber().toString() + "! Moving to next frame.");
 			return true;
@@ -98,12 +98,17 @@ public class BowlingGame {
 	}
 	
 	private void setStrikeFrame(Integer pins) {
-		getCurrentFrame().setFirstBallPinCount(pins); //TODO: Change this to a setter in the Frame class which sets to current ballpincount (next non null) in the Frame. That way this works for 10th frame
+		if(getCurrentFrameNumber() < 10) {
+			getCurrentFrame().setFirstBallPinCount(pins);
+		}
+		else {
+			getCurrentFrame().setCurrentBallPinCount(pins);
+		}
 	}
 	
 	private Boolean checkSpareFrame(Integer pins) {
-		//check for SPARE on the 2nd ball roll
-		if(getCurrentFrame().getFirstBallPinCount() != null && (getCurrentFrame().getFirstBallPinCount() + pins) == maxPinCount) {
+		//check for SPARE
+		if(getCurrentFrame().getPreviousBallPinCount() != null && (getCurrentFrame().getPreviousBallPinCount() + pins) == maxPinCount) {
 			System.out.println("Rolled a SPARE on frame " + getCurrentFrameNumber().toString() + "! Moving to next frame.");
 			return true;
 		}
@@ -111,20 +116,31 @@ public class BowlingGame {
 	}
 	
 	private void setSpareFrame(Integer pins) {
-		getCurrentFrame().setSecondBallPinCount(pins); //TODO: Change this to a setter in the Frame class which sets to current ballpincount in the Frame. That way this works for 10th frame
+		if(getCurrentFrameNumber() < 10) {
+			getCurrentFrame().setSecondBallPinCount(pins);
+		}
+		else {
+			getCurrentFrame().setCurrentBallPinCount(pins);
+		}
 	}
 	
 	private Boolean checkOpenFrame(Integer pins) {
-		//check for OPEN on the 2nd ball roll
-		if(getCurrentFrame().getFirstBallPinCount() != null && (getCurrentFrame().getFirstBallPinCount() + pins) < maxPinCount) {
+		//check for OPEN
+		if(getCurrentFrame().getPreviousBallPinCount() != null && (getCurrentFrame().getPreviousBallPinCount() + pins) < maxPinCount) {
 			System.out.println("Rolled an OPEN on frame " + getCurrentFrameNumber().toString() + ". Moving to next frame.");
 			return true;
 		}
 		return false;
 	}
 	
+	//TODO: logic is the same as setSpareFrame method, consider consolidating into one method
 	private void setOpenFrame(Integer pins) {
-		getCurrentFrame().setSecondBallPinCount(pins); //TODO: Change this to a setter in the Frame class which sets to current ballpincount in the Frame. That way this works for 10th frame
+		if(getCurrentFrameNumber() < 10) {
+			getCurrentFrame().setSecondBallPinCount(pins);
+		}
+		else {
+			getCurrentFrame().setCurrentBallPinCount(pins);
+		}
 	}
 	
 }

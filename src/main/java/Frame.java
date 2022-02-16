@@ -8,6 +8,39 @@ public class Frame {
 	private Integer fillBallPinCount = null; //a fill ball is given if a strike of spare occurs on the 10th frame
 
 	/**
+	 * Set 1st, 2nd, or fill ball pin count to the number of pins knocked down by the current roll in the frame.
+	 * @param pins
+	 */
+	public void setCurrentBallPinCount(Integer pins) {
+		if(this.firstBallPinCount == null) {
+			setFirstBallPinCount(pins);
+		}
+		else if(this.secondBallPinCount == null) {
+			setSecondBallPinCount(pins);
+		}
+		else if(this.fillBallPinCount == null) {
+			setFillBallPinCount(pins);
+		}
+	}
+	
+	/**
+	 * Method that gets the pin count for the latest roll has been stored in the frame
+	 * @param pins
+	 */
+	public Integer getPreviousBallPinCount() {
+		if(this.firstBallPinCount == null) {
+			return null;
+		}
+		else if(this.secondBallPinCount == null) {
+			return getFirstBallPinCount();
+		}
+		else if(this.fillBallPinCount == null) {
+			return getSecondBallPinCount();
+		}
+		return getFillBallPinCount();
+	}
+	
+	/**
 	 * @return the firstBallPinCount
 	 */
 	public Integer getFirstBallPinCount() {
