@@ -11,6 +11,7 @@ public class BowlingGame {
 	private List<Frame> frameList = new ArrayList<Frame> ();
 	
 	
+	
 	/**
 	 * default constructor, new game starts with the first Frame
 	 */
@@ -30,15 +31,15 @@ public class BowlingGame {
 			
 			if(checkStrikeFrame(pins)) {
 				setStrikeFrame(pins);
-				frameList.add(new Frame());
+				nextFrameIfNotFinal();
 			}
 			else if (checkSpareFrame(pins)){
 				setSpareFrame(pins);
-				frameList.add(new Frame());
+				nextFrameIfNotFinal();
 			}
 			else if (checkOpenFrame(pins)){
 				setOpenFrame(pins);
-				frameList.add(new Frame());
+				nextFrameIfNotFinal();
 			}
 			else {
 				//first ball roll was not a strike, continuing with current frame..
@@ -48,6 +49,7 @@ public class BowlingGame {
 		}
 		catch(IllegalStateException ex) {
 			System.out.println(ex.getMessage());
+			throw ex;
 		}
 	}
 	
@@ -68,15 +70,16 @@ public class BowlingGame {
 		if(pins > maxPinCount) {
 			throw new IllegalStateException("Pin count exceeds pins on the lane");
 		}
-		//Check that the 1stball + 2ndball in a frame are not greater than MaxPinCount (except on the 10th frame)
-		if(getCurrentFrameNumber() != maxFrameCount && getCurrentFrame().getFirstBallPinCount() != null && (getCurrentFrame().getFirstBallPinCount() + pins)  > maxPinCount) {
+		//Check that the current roll + previous roll in the current frame are not greater than 10 unless the last frame was a strike
+		if(getCurrentFrame().getPreviousBallPinCount() != null && getCurrentFrame().getPreviousBallPinCount() != maxPinCount && (getCurrentFrame().getPreviousBallPinCount() + pins)  > maxPinCount) {
 			throw new IllegalStateException("Pin count exceeds pins on the lane"); 
 		}
 		if(pins < 0) {
 			throw new IllegalStateException("Negative roll is invalid");
 		}
-		if(frameList.size() > maxFrameCount) {
-			throw new IllegalStateException("Maximum frame count exceeded. Game has already ended.");
+		//trying to roll after the frames are up, the fill ball has already been rolled, or trying to roll a fill ball if it wasn't earned
+		if(getCurrentFrameNumber() > maxFrameCount || getCurrentFrame().getFillBallPinCount() != null || (getCurrentFrameNumber() == maxFrameCount && getCurrentFrame().firstAndSecondRollComplete() == true && fillBallEarned() == false)) {
+			throw new IllegalStateException("Cannot roll after game is over");
 		}
 	}
 	
@@ -98,7 +101,7 @@ public class BowlingGame {
 	}
 	
 	private void setStrikeFrame(Integer pins) {
-		if(getCurrentFrameNumber() < 10) {
+		if(getCurrentFrameNumber() < maxFrameCount) {
 			getCurrentFrame().setFirstBallPinCount(pins);
 		}
 		else {
@@ -116,7 +119,7 @@ public class BowlingGame {
 	}
 	
 	private void setSpareFrame(Integer pins) {
-		if(getCurrentFrameNumber() < 10) {
+		if(getCurrentFrameNumber() < maxFrameCount) {
 			getCurrentFrame().setSecondBallPinCount(pins);
 		}
 		else {
@@ -135,12 +138,28 @@ public class BowlingGame {
 	
 	//TODO: logic is the same as setSpareFrame method, consider consolidating into one method
 	private void setOpenFrame(Integer pins) {
-		if(getCurrentFrameNumber() < 10) {
+		if(getCurrentFrameNumber() < maxFrameCount) {
 			getCurrentFrame().setSecondBallPinCount(pins);
 		}
 		else {
 			getCurrentFrame().setCurrentBallPinCount(pins);
 		}
 	}
+	
+	private void nextFrameIfNotFinal() {
+		if(getCurrentFrameNumber() < maxFrameCount) {
+			frameList.add(new Frame());
+		}
+	}
+	
+	public Boolean fillBallEarned(){
+		if(getCurrentFrameNumber() == maxFrameCount && getCurrentFrame().getFirstBallPinCount() != null && getCurrentFrame().getSecondBallPinCount() != null) {
+			if((getCurrentFrame().getFirstBallPinCount() + getCurrentFrame().getSecondBallPinCount()) >= maxPinCount) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	
 }

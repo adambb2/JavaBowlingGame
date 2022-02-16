@@ -6,7 +6,7 @@ public class Frame {
 	private Integer secondBallPinCount = null; //second ball only occurs if a strike was NOT rolled on the first ball..  OR if it is the 10th frame
 	
 	private Integer fillBallPinCount = null; //a fill ball is given if a strike of spare occurs on the 10th frame
-
+	
 	/**
 	 * Set 1st, 2nd, or fill ball pin count to the number of pins knocked down by the current roll in the frame.
 	 * @param pins
@@ -39,6 +39,15 @@ public class Frame {
 		}
 		return getFillBallPinCount();
 	}
+	
+	public Boolean firstAndSecondRollComplete(){
+		if(getFirstBallPinCount() != null && getSecondBallPinCount() != null) {
+			return true;
+		}
+		return false;
+	}
+	
+	
 	
 	/**
 	 * @return the firstBallPinCount
