@@ -71,15 +71,15 @@ public class BowlingGame {
 				for(int rollIndex = 0; rollIndex < rollList.size(); rollIndex++){
 				    score += rollList.get(rollIndex).getPinCount();
 					//STRIKE first subsequent ball extra points
-					if(rollIndex+1 <= rollList.size() && rollList.get(rollIndex).getPinCount() == maxPinCount){
+					if(rollIndex+1 < rollList.size() && rollList.get(rollIndex).getPinCount() == maxPinCount){
 						score += rollList.get(rollIndex+1).getPinCount();
 					}
 					//STRIKE second subsequent ball extra points
-					if(rollIndex+2 <= rollList.size() && rollList.get(rollIndex).getPinCount() == maxPinCount){
+					if(rollIndex+2 < rollList.size() && rollList.get(rollIndex).getPinCount() == maxPinCount){
 						score += rollList.get(rollIndex+2).getPinCount();
 					}
 					//SPARE extra points
-					if(rollIndex+2 <= rollList.size() && (rollList.get(rollIndex).getPinCount() + rollList.get(rollIndex+1).getPinCount()) == maxPinCount){
+					if(rollIndex+2 < rollList.size() && (rollList.get(rollIndex).getPinCount() + rollList.get(rollIndex+1).getPinCount()) == maxPinCount){
 						//rolls equaling a SPARE must occur in the same frame
 						if(rollList.get(rollIndex).getFrameNumber() == rollList.get(rollIndex+1).getFrameNumber()) {
 							score += rollList.get(rollIndex+2).getPinCount();
