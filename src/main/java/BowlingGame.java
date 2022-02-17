@@ -14,7 +14,6 @@ public class BowlingGame {
 	
 	private List<Frame> frameList = new ArrayList<Frame>();
 	
-	private List<Integer> pinList = new ArrayList<Integer>();
 	
 	
 	
@@ -34,7 +33,6 @@ public class BowlingGame {
 	public void roll(Integer pins) {
 		try {
 			validateRoll(pins);
-			pinList.add(pins);
 			
 			if(checkStrikeFrame(pins)) {
 				setStrikeFrame(pins);
@@ -70,23 +68,23 @@ public class BowlingGame {
 			}
 			else {
 				
-				List<ArrayList<Integer>> nestedFrameIntegerList =  getNestedFrameIntegerList();
+				List<Roll> rollList = getRollList();
 				
-				for(int frameIndex = 0; frameIndex < nestedFrameIntegerList.size(); frameIndex++){
-					ArrayList<Integer> currentFrame = nestedFrameIntegerList.get(frameIndex);
-					for(int ballIndex = 0; ballIndex < currentFrame.size(); ballIndex++){
-					    score += currentFrame.get(ballIndex);
-						//strike extra points
-						if(currentFrame.get(ballIndex) == maxPinCount && ballIndex+1 <= currentFrame.size()){
-							score += pinList.get(i+1);
-						}
-						if(pinList.get(i) == maxPinCount && i+2 <= pinList.size()){
-							score += pinList.get(i+2);
-						}
-						//spare extra points
-						//TODO: this is going to incorrectly detect a spare when two frames such as this are side by side (3|6),(4|3) 
-						if(i+1 <= pinList.size() && pinList.get(i) == maxPinCount && (pinList.get(i) + pinList.get(i+1)) == maxPinCount){
-							score += pinList.get(i+1);
+				for(int rollIndex = 0; rollIndex < rollList.size(); rollIndex++){
+				    score += rollList.get(rollIndex).getPinCount();
+					//STRIKE first subsequent ball extra points
+					if(rollIndex+1 <= rollList.size() && rollList.get(rollIndex).getPinCount() == maxPinCount){
+						score += rollList.get(rollIndex+1).getPinCount();
+					}
+					//STRIKE second subsequent ball extra points
+					if(rollIndex+2 <= rollList.size() && rollList.get(rollIndex).getPinCount() == maxPinCount){
+						score += rollList.get(rollIndex+2).getPinCount();
+					}
+					//SPARE extra points
+					if(rollIndex+2 <= rollList.size() && (rollList.get(rollIndex).getPinCount() + rollList.get(rollIndex+1).getPinCount()) == maxPinCount){
+						//rolls equaling a SPARE must occur in the same frame
+						if(rollList.get(rollIndex).getFrameNumber() == rollList.get(rollIndex+1).getFrameNumber()) {
+							score += rollList.get(rollIndex+2).getPinCount();
 						}
 					}
 				}
@@ -206,20 +204,6 @@ public class BowlingGame {
 		}
 		return false;
 	}
-	
-	//TODO: Method to get the next two non-null roll pin sum after a strike has occured
-	
-	//TODO: Method to get the next non-null roll pin after a spare has occured
-	
-//	private Map<Integer, List<Integer>> getFrameMapFromFrameList(){
-//		Map<Integer, List<Integer>> frameMap = new HashMap<Integer, List<Integer>>();
-//		
-//		for(int i=0; i<frameList.size(); i++) {
-//			frameMap.put(i+1, frameList.get(i).getFrameToList());
-//		}
-//		
-//		return frameMap;
-//	}
 	
 	private List<ArrayList<Integer>> getNestedFrameIntegerList(){
 		List<ArrayList<Integer>> nestedFrameIntegerList = new ArrayList<ArrayList<Integer>>();
