@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+
 import java.util.List;
+
 
 
 public class BowlingGame {
@@ -67,22 +69,28 @@ public class BowlingGame {
 				throw new IllegalStateException("Score cannot be taken until the end of the game"); 
 			}
 			else {
-				//TODO: index through the FRAMES LIST rather than the PINS LIST
-				for(int i = 0; i < pinList.size(); i++){
-				    score += pinList.get(i);
-					//strike extra points
-					if(pinList.get(i) == maxPinCount && i+1 <= pinList.size()){
-						score += pinList.get(i+1);
-					}
-					if(pinList.get(i) == maxPinCount && i+2 <= pinList.size()){
-						score += pinList.get(i+2);
-					}
-					//spare extra points
-					//TODO: this is going to incorrectly detect a spare when two frames such as this are side by side (3|6),(4|3) 
-					if(i+1 <= pinList.size() && pinList.get(i) == maxPinCount && (pinList.get(i) + pinList.get(i+1)) == maxPinCount){
-						score += pinList.get(i+1);
+				
+				List<ArrayList<Integer>> nestedFrameIntegerList =  getNestedFrameIntegerList();
+				
+				for(int frameIndex = 0; frameIndex < nestedFrameIntegerList.size(); frameIndex++){
+					ArrayList<Integer> currentFrame = nestedFrameIntegerList.get(frameIndex);
+					for(int ballIndex = 0; ballIndex < currentFrame.size(); ballIndex++){
+					    score += currentFrame.get(ballIndex);
+						//strike extra points
+						if(currentFrame.get(ballIndex) == maxPinCount && ballIndex+1 <= currentFrame.size()){
+							score += pinList.get(i+1);
+						}
+						if(pinList.get(i) == maxPinCount && i+2 <= pinList.size()){
+							score += pinList.get(i+2);
+						}
+						//spare extra points
+						//TODO: this is going to incorrectly detect a spare when two frames such as this are side by side (3|6),(4|3) 
+						if(i+1 <= pinList.size() && pinList.get(i) == maxPinCount && (pinList.get(i) + pinList.get(i+1)) == maxPinCount){
+							score += pinList.get(i+1);
+						}
 					}
 				}
+				
 				return score;
 			}
 		}
@@ -182,7 +190,7 @@ public class BowlingGame {
 		}
 	}
 	
-	public Boolean fillBallEarned(){
+	private Boolean fillBallEarned(){
 		if(getCurrentFrameNumber() == maxFrameCount && getCurrentFrame().getFirstBallPinCount() != null && getCurrentFrame().getSecondBallPinCount() != null) {
 			if((getCurrentFrame().getFirstBallPinCount() + getCurrentFrame().getSecondBallPinCount()) >= maxPinCount) {
 				return true;
@@ -192,7 +200,7 @@ public class BowlingGame {
 	}
 	
 	//trying to roll after the frames are up, the fill ball has already been rolled, or trying to roll a fill ball if it wasn't earned
-	public Boolean gameComplete() {
+	private Boolean gameComplete() {
 		if(getCurrentFrameNumber() > maxFrameCount || getCurrentFrame().getFillBallPinCount() != null || (getCurrentFrameNumber() == maxFrameCount && getCurrentFrame().firstAndSecondRollComplete() == true && fillBallEarned() == false)) {
 			return true;
 		}
@@ -202,6 +210,39 @@ public class BowlingGame {
 	//TODO: Method to get the next two non-null roll pin sum after a strike has occured
 	
 	//TODO: Method to get the next non-null roll pin after a spare has occured
+	
+//	private Map<Integer, List<Integer>> getFrameMapFromFrameList(){
+//		Map<Integer, List<Integer>> frameMap = new HashMap<Integer, List<Integer>>();
+//		
+//		for(int i=0; i<frameList.size(); i++) {
+//			frameMap.put(i+1, frameList.get(i).getFrameToList());
+//		}
+//		
+//		return frameMap;
+//	}
+	
+	private List<ArrayList<Integer>> getNestedFrameIntegerList(){
+		List<ArrayList<Integer>> nestedFrameIntegerList = new ArrayList<ArrayList<Integer>>();
+		
+		for(int i=0; i<frameList.size(); i++) {
+			nestedFrameIntegerList.add(frameList.get(i).getFrameToIntegerList());
+		}
+		
+		return nestedFrameIntegerList;
+	}
+	
+	private List<Roll> getRollList(){
+		List<Roll> rollList = new ArrayList<Roll>();
+		
+		for(int frameNumber=1; frameNumber<frameList.size()+1; frameNumber++) {
+			List<Integer> frameRolls = frameList.get(frameNumber).getFrameToIntegerList();
+			for(int rollIndex=0; rollIndex<frameRolls.size(); rollIndex++) {
+				Integer pinCount = frameRolls.get(rollIndex);
+				rollList.add(new Roll(frameNumber, pinCount));
+			}
+		}
+		return rollList;
+	}
 	
 	
 }

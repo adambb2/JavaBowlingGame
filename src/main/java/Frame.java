@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.List;
 
 public class Frame {
 	
@@ -6,6 +8,25 @@ public class Frame {
 	private Integer secondBallPinCount = null; //second ball only occurs if a strike was NOT rolled on the first ball..  OR if it is the 10th frame
 	
 	private Integer fillBallPinCount = null; //a fill ball is given if a strike of spare occurs on the 10th frame
+	
+	
+	/**
+	 * @return the pins knocked down by each roll in oder as an IntegerList
+	 */
+	public ArrayList<Integer> getFrameToIntegerList() {
+		ArrayList<Integer> ballPinsList = new ArrayList<Integer>();
+		
+		if(this.firstBallPinCount != null) {
+			ballPinsList.add(getFirstBallPinCount());
+		}
+		if(this.secondBallPinCount != null) {
+			ballPinsList.add(getSecondBallPinCount());
+		}
+		if(this.fillBallPinCount != null) {
+			ballPinsList.add(getFillBallPinCount());
+		}
+		return ballPinsList;
+	}
 	
 	/**
 	 * Set 1st, 2nd, or fill ball pin count to the number of pins knocked down by the current roll in the frame.
