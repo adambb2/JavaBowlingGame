@@ -15,8 +15,6 @@ public class BowlingGame {
 	private List<Frame> frameList = new ArrayList<Frame>();
 	
 	
-	
-	
 	/**
 	 * default constructor, new game starts with the first Frame
 	 */
@@ -47,8 +45,8 @@ public class BowlingGame {
 				nextFrameIfNotFinal();
 			}
 			else {
-				//first ball roll was not a strike, continuing with current frame..
-				getCurrentFrame().setFirstBallPinCount(pins);
+				//current ball roll was not a strike, continuing with current frame..
+				getCurrentFrame().setCurrentBallPinCount(pins);
 			}		
 		}
 		catch(IllegalStateException ex) {
@@ -89,6 +87,7 @@ public class BowlingGame {
 					}
 				}
 				
+				System.out.println("Final Score: " + score.toString() + ".");
 				return score;
 			}
 		}
@@ -107,9 +106,11 @@ public class BowlingGame {
 		if(pins > maxPinCount) {
 			throw new IllegalStateException("Pin count exceeds pins on the lane");
 		}
-		//Check that the current roll + previous roll in the current frame are not greater than 10 unless the last frame was a strike
-		if(getCurrentFrame().getPreviousBallPinCount() != null && getCurrentFrame().getPreviousBallPinCount() != maxPinCount && (getCurrentFrame().getPreviousBallPinCount() + pins)  > maxPinCount) {
-			throw new IllegalStateException("Pin count exceeds pins on the lane"); 
+		//Check that the (current roll + previous roll) in the current frame is not greater than 10 unless the pins reset prior to this roll because of a STRIKE... OR a SPARE before the 10th frame Fill ball
+		if(getCurrentFrame().getPreviousBallPinCount() != null && (getCurrentFrame().getPreviousBallPinCount() + pins)  > maxPinCount) {
+			if(getCurrentFrame().getPreviousBallPinCount() != maxPinCount && !(getCurrentFrameNumber() == maxFrameCount && getCurrentFrame().getFirstBallPinCount() != null && getCurrentFrame().getSecondBallPinCount() != null && (getCurrentFrame().getFirstBallPinCount() + getCurrentFrame().getSecondBallPinCount()) == maxPinCount)) {
+				throw new IllegalStateException("Pin count exceeds pins on the lane"); 
+			}
 		}
 		if(pins < 0) {
 			throw new IllegalStateException("Negative roll is invalid");
@@ -130,7 +131,7 @@ public class BowlingGame {
 	private Boolean checkStrikeFrame(Integer pins) {
 		//check for STRIKE
 		if(pins == maxPinCount) {
-			System.out.println("Rolled a STRIKE on frame " + getCurrentFrameNumber().toString() + "! Moving to next frame.");
+			System.out.println("Rolled a STRIKE on frame " + getCurrentFrameNumber().toString() + "!");
 			return true;
 		}
 		return false;
@@ -148,7 +149,7 @@ public class BowlingGame {
 	private Boolean checkSpareFrame(Integer pins) {
 		//check for SPARE
 		if(getCurrentFrame().getPreviousBallPinCount() != null && (getCurrentFrame().getPreviousBallPinCount() + pins) == maxPinCount) {
-			System.out.println("Rolled a SPARE on frame " + getCurrentFrameNumber().toString() + "! Moving to next frame.");
+			System.out.println("Rolled a SPARE on frame " + getCurrentFrameNumber().toString() + "!");
 			return true;
 		}
 		return false;
@@ -166,7 +167,7 @@ public class BowlingGame {
 	private Boolean checkOpenFrame(Integer pins) {
 		//check for OPEN
 		if(getCurrentFrame().getPreviousBallPinCount() != null && (getCurrentFrame().getPreviousBallPinCount() + pins) < maxPinCount) {
-			System.out.println("Rolled an OPEN on frame " + getCurrentFrameNumber().toString() + ". Moving to next frame.");
+			System.out.println("Rolled an OPEN on frame " + getCurrentFrameNumber().toString() + ".");
 			return true;
 		}
 		return false;
@@ -197,6 +198,7 @@ public class BowlingGame {
 		return false;
 	}
 	
+	
 	//trying to roll after the frames are up, the fill ball has already been rolled, or trying to roll a fill ball if it wasn't earned
 	private Boolean gameComplete() {
 		if(getCurrentFrameNumber() > maxFrameCount || getCurrentFrame().getFillBallPinCount() != null || (getCurrentFrameNumber() == maxFrameCount && getCurrentFrame().firstAndSecondRollComplete() == true && fillBallEarned() == false)) {
@@ -218,15 +220,18 @@ public class BowlingGame {
 	private List<Roll> getRollList(){
 		List<Roll> rollList = new ArrayList<Roll>();
 		
-		for(int frameNumber=1; frameNumber<frameList.size()+1; frameNumber++) {
-			List<Integer> frameRolls = frameList.get(frameNumber).getFrameToIntegerList();
+		for(int frameIndex=0; frameIndex<frameList.size(); frameIndex++) {
+			List<Integer> frameRolls = frameList.get(frameIndex).getFrameToIntegerList();
 			for(int rollIndex=0; rollIndex<frameRolls.size(); rollIndex++) {
 				Integer pinCount = frameRolls.get(rollIndex);
+				Integer frameNumber = frameIndex + 1;
 				rollList.add(new Roll(frameNumber, pinCount));
 			}
 		}
 		return rollList;
 	}
+	
+
 	
 	
 }
