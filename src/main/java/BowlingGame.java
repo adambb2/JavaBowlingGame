@@ -32,20 +32,22 @@ public class BowlingGame {
 		try {
 			validateRoll(pins);
 			
-			if(checkStrikeFrame(pins)) {
-				setStrikeFrame(pins);
+			if(checkStrikeRoll(pins)) {
+				System.out.println("Rolled a STRIKE on frame " + getCurrentFrameNumber().toString() + "!");
+				getCurrentFrame().setCurrentBallPinCount(pins);
 				nextFrameIfNotFinal();
 			}
-			else if (checkSpareFrame(pins)){
-				setSpareFrame(pins);
+			else if (checkSpareRoll(pins)){
+				System.out.println("Rolled a SPARE on frame " + getCurrentFrameNumber().toString() + "!");
+				getCurrentFrame().setCurrentBallPinCount(pins);
 				nextFrameIfNotFinal();
 			}
-			else if (checkOpenFrame(pins)){
-				setOpenFrame(pins);
+			else if (checkOpenRoll(pins)){
+				System.out.println("Rolled an OPEN on frame " + getCurrentFrameNumber().toString() + "!");
+				getCurrentFrame().setCurrentBallPinCount(pins);
 				nextFrameIfNotFinal();
 			}
 			else {
-				//current ball roll was not a strike, continuing with current frame..
 				getCurrentFrame().setCurrentBallPinCount(pins);
 			}		
 		}
@@ -145,7 +147,7 @@ public class BowlingGame {
 	 * @return Boolean
 	 * @param pins
 	 */
-	private Boolean checkStrikeFrame(Integer pins) {
+	private Boolean checkStrikeRoll(Integer pins) {
 		if(pins == maxPinCount) {
 			return true;
 		}
@@ -153,26 +155,11 @@ public class BowlingGame {
 	}
 	
 	/**
-	 * Stores in the current frame the number of pins knocked down by a Strike
-	 * @param pins
-	 */
-	private void setStrikeFrame(Integer pins) {
-		System.out.println("Rolled a STRIKE on frame " + getCurrentFrameNumber().toString() + "!");
-		if(getCurrentFrameNumber() < maxFrameCount) {
-			getCurrentFrame().setFirstBallPinCount(pins);
-		}
-		else {
-			getCurrentFrame().setCurrentBallPinCount(pins);
-		}
-	}
-	
-	/**
 	 * Checks if a spare occurred due to the previous roll plus the current roll knocking down 10 pins total
 	 * @return Boolean
 	 * @param pins
 	 */
-	private Boolean checkSpareFrame(Integer pins) {
-		//check for SPARE
+	private Boolean checkSpareRoll(Integer pins) {
 		if(getCurrentFrame().getRecentBallPinCount() != null && (getCurrentFrame().getRecentBallPinCount() + pins) == maxPinCount) {
 			return true;
 		}
@@ -180,43 +167,15 @@ public class BowlingGame {
 	}
 	
 	/**
-	 * Stores in the current frame the number of pins knocked down by the 2nd roll of a Spare
-	 * @param pins
-	 */
-	private void setSpareFrame(Integer pins) {
-		System.out.println("Rolled a SPARE on frame " + getCurrentFrameNumber().toString() + "!");
-		if(getCurrentFrameNumber() < maxFrameCount) {
-			getCurrentFrame().setSecondBallPinCount(pins);
-		}
-		else {
-			getCurrentFrame().setCurrentBallPinCount(pins);
-		}
-	}
-	
-	/**
 	 * Check if the current roll and the previous roll together would make an Open frame
 	 * @return Boolean
 	 * @param pins
 	 */
-	private Boolean checkOpenFrame(Integer pins) {
+	private Boolean checkOpenRoll(Integer pins) {
 		if(getCurrentFrame().getRecentBallPinCount() != null && (getCurrentFrame().getRecentBallPinCount() + pins) < maxPinCount) {
 			return true;
 		}
 		return false;
-	}
-	
-	/**
-	 * Stores in the current frame the number of pins knocked down by the second roll of an Open frame
-	 * @param pins
-	 */
-	private void setOpenFrame(Integer pins) {
-		System.out.println("Rolled an OPEN on frame " + getCurrentFrameNumber().toString() + ".");
-		if(getCurrentFrameNumber() < maxFrameCount) {
-			getCurrentFrame().setSecondBallPinCount(pins);
-		}
-		else {
-			getCurrentFrame().setCurrentBallPinCount(pins);
-		}
 	}
 	
 	/**
