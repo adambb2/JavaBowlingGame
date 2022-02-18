@@ -7,11 +7,11 @@ public class Roll {
 	
 	
 	/**
-	 * @param pinCount
-	 * @param frameNumber
+	 * Constructor
+	 * @param pinCount (number of pins knocked down by the roll)
+	 * @param frameNumber in which the ball roll occurred
 	 */
 	public Roll(Integer frameNumber, Integer pinCount) {
-		super();
 		this.pinCount = pinCount;
 		this.frameNumber = frameNumber;
 	}

@@ -6,7 +6,7 @@ import java.util.List;
 
 public class BowlingGame {
 	
-	Integer score = 0;
+	private Integer score = 0;
 	
 	private Integer maxFrameCount = 10;
 	
@@ -23,8 +23,8 @@ public class BowlingGame {
 	}
 
 	/**
-	 * Method that updates the bowling game frame history with the number of pins that are knocked down with each roll. This method must be called
-	 * in the sequential order that the rolls occurred.
+	 * Updates the Bowling Game's frame list with the number of pins that are knocked down with each roll. This method must be called
+	 * in the sequential order that the rolls occurred. Validation checks are done to ensure the rolls and pin counts for each roll are possible
 	 * @param pins
 	 * @return void
 	 */
@@ -56,7 +56,9 @@ public class BowlingGame {
 	}
 	
 	/**
-	 * Method that calculates the score of the bowling game. Can only be called at the end of the 10 frame game.
+	 * Calculates the score of the Bowling Game. Can only be called at the end of the 10 frame game.
+	 * Score is equal to number of pins knocked down by each roll plus bonus points that are awarded for Strikes and Spares
+	 * that occur within frames 1 to 9.
 	 * @return score
 	 */
 	public int score() {
@@ -102,16 +104,17 @@ public class BowlingGame {
 	
 	
 	/**
-	 * Method that validates that the number of pins knocked down by the roll is not outside what is possible for a roll in the current frame
+	 * Validates that the number of pins knocked down by the roll is not outside what is possible for a roll in the current frame
+	 * exceptions are thrown if an invalid roll is detected
 	 * @param pins
 	 */
 	private void validateRoll(Integer pins) {
 		if(pins > maxPinCount) {
 			throw new IllegalStateException("Pin count exceeds pins on the lane");
 		}
-		//Check that the (current roll + previous roll) in the current frame is not greater than 10 unless the pins reset prior to this roll because of a STRIKE... OR a SPARE before the 10th frame Fill ball
-		if(getCurrentFrame().getPreviousBallPinCount() != null && (getCurrentFrame().getPreviousBallPinCount() + pins)  > maxPinCount) {
-			if(getCurrentFrame().getPreviousBallPinCount() != maxPinCount && !(getCurrentFrameNumber() == maxFrameCount && getCurrentFrame().getFirstBallPinCount() != null && getCurrentFrame().getSecondBallPinCount() != null && (getCurrentFrame().getFirstBallPinCount() + getCurrentFrame().getSecondBallPinCount()) == maxPinCount)) {
+		//Check that sum of (previous roll + current roll) in the current frame is not greater than 10 unless the pins reset prior to the previous roll being a STRIKE... OR a SPARE before the 10th frame Fill ball
+		if(getCurrentFrame().getRecentBallPinCount() != null && (getCurrentFrame().getRecentBallPinCount() + pins)  > maxPinCount) {
+			if(getCurrentFrame().getRecentBallPinCount() != maxPinCount && !(getCurrentFrameNumber() == maxFrameCount && getCurrentFrame().getFirstBallPinCount() != null && getCurrentFrame().getSecondBallPinCount() != null && (getCurrentFrame().getFirstBallPinCount() + getCurrentFrame().getSecondBallPinCount()) == maxPinCount)) {
 				throw new IllegalStateException("Pin count exceeds pins on the lane"); 
 			}
 		}
@@ -123,24 +126,38 @@ public class BowlingGame {
 		}
 	}
 	
+	/**
+	 * @return current frame
+	 */
 	private Frame getCurrentFrame() {
 		return frameList.get(frameList.size()-1);
 	}
 	
+	/**
+	 * @return current frame number
+	 */
 	private Integer getCurrentFrameNumber() {
 		return frameList.size();
 	}
 	
+	/**
+	 * Returns true if all of the pins in the lane were knocked down, otherwise returns false
+	 * @return Boolean
+	 * @param pins
+	 */
 	private Boolean checkStrikeFrame(Integer pins) {
-		//check for STRIKE
 		if(pins == maxPinCount) {
-			System.out.println("Rolled a STRIKE on frame " + getCurrentFrameNumber().toString() + "!");
 			return true;
 		}
 		return false;
 	}
 	
+	/**
+	 * Stores in the current frame the number of pins knocked down by a Strike
+	 * @param pins
+	 */
 	private void setStrikeFrame(Integer pins) {
+		System.out.println("Rolled a STRIKE on frame " + getCurrentFrameNumber().toString() + "!");
 		if(getCurrentFrameNumber() < maxFrameCount) {
 			getCurrentFrame().setFirstBallPinCount(pins);
 		}
@@ -149,16 +166,25 @@ public class BowlingGame {
 		}
 	}
 	
+	/**
+	 * Checks if a spare occurred due to the previous roll plus the current roll knocking down 10 pins total
+	 * @return Boolean
+	 * @param pins
+	 */
 	private Boolean checkSpareFrame(Integer pins) {
 		//check for SPARE
-		if(getCurrentFrame().getPreviousBallPinCount() != null && (getCurrentFrame().getPreviousBallPinCount() + pins) == maxPinCount) {
-			System.out.println("Rolled a SPARE on frame " + getCurrentFrameNumber().toString() + "!");
+		if(getCurrentFrame().getRecentBallPinCount() != null && (getCurrentFrame().getRecentBallPinCount() + pins) == maxPinCount) {
 			return true;
 		}
 		return false;
 	}
 	
+	/**
+	 * Stores in the current frame the number of pins knocked down by the 2nd roll of a Spare
+	 * @param pins
+	 */
 	private void setSpareFrame(Integer pins) {
+		System.out.println("Rolled a SPARE on frame " + getCurrentFrameNumber().toString() + "!");
 		if(getCurrentFrameNumber() < maxFrameCount) {
 			getCurrentFrame().setSecondBallPinCount(pins);
 		}
@@ -167,17 +193,24 @@ public class BowlingGame {
 		}
 	}
 	
+	/**
+	 * Check if the current roll and the previous roll together would make an Open frame
+	 * @return Boolean
+	 * @param pins
+	 */
 	private Boolean checkOpenFrame(Integer pins) {
-		//check for OPEN
-		if(getCurrentFrame().getPreviousBallPinCount() != null && (getCurrentFrame().getPreviousBallPinCount() + pins) < maxPinCount) {
-			System.out.println("Rolled an OPEN on frame " + getCurrentFrameNumber().toString() + ".");
+		if(getCurrentFrame().getRecentBallPinCount() != null && (getCurrentFrame().getRecentBallPinCount() + pins) < maxPinCount) {
 			return true;
 		}
 		return false;
 	}
 	
-	//TODO: logic is the same as setSpareFrame method, consider consolidating into one method
+	/**
+	 * Stores in the current frame the number of pins knocked down by the second roll of an Open frame
+	 * @param pins
+	 */
 	private void setOpenFrame(Integer pins) {
+		System.out.println("Rolled an OPEN on frame " + getCurrentFrameNumber().toString() + ".");
 		if(getCurrentFrameNumber() < maxFrameCount) {
 			getCurrentFrame().setSecondBallPinCount(pins);
 		}
@@ -186,12 +219,19 @@ public class BowlingGame {
 		}
 	}
 	
+	/**
+	 * Adds a new frame to the top of the Bowling Game's frame list if the 10th frame has not been reached
+	 */
 	private void nextFrameIfNotFinal() {
 		if(getCurrentFrameNumber() < maxFrameCount) {
 			frameList.add(new Frame());
 		}
 	}
 	
+	/**
+	 * Determines if a Fill ball was just earned on the 10th frame by either a Strike or Spare (all 10 pins were knocked down within the first two rolls)
+	 * @return Boolean
+	 */
 	private Boolean fillBallEarned(){
 		if(getCurrentFrameNumber() == maxFrameCount && getCurrentFrame().getFirstBallPinCount() != null && getCurrentFrame().getSecondBallPinCount() != null) {
 			if((getCurrentFrame().getFirstBallPinCount() + getCurrentFrame().getSecondBallPinCount()) >= maxPinCount) {
@@ -202,7 +242,12 @@ public class BowlingGame {
 	}
 	
 	
-	//trying to roll after the frames are up, the fill ball has already been rolled, or trying to roll a fill ball if it wasn't earned
+	/**
+	 * Return true if the game is now complete. 
+	 * If the 1st and 2nd rolls already occurred on the 10th frame then the game is over UNLESS a fill ball was earned. 
+	 * If a fill ball was earned, the game is over if the 1st, 2nd and 3rd roll (fill ball) have occurred on the 10th frame.
+	 * @return Boolean
+	 */
 	private Boolean gameComplete() {
 		if(getCurrentFrameNumber() > maxFrameCount || getCurrentFrame().getFillBallPinCount() != null || (getCurrentFrameNumber() == maxFrameCount && getCurrentFrame().firstAndSecondRollComplete() == true && fillBallEarned() == false)) {
 			return true;
@@ -210,16 +255,12 @@ public class BowlingGame {
 		return false;
 	}
 	
-	private List<ArrayList<Integer>> getNestedFrameIntegerList(){
-		List<ArrayList<Integer>> nestedFrameIntegerList = new ArrayList<ArrayList<Integer>>();
-		
-		for(int i=0; i<frameList.size(); i++) {
-			nestedFrameIntegerList.add(frameList.get(i).getFrameToIntegerList());
-		}
-		
-		return nestedFrameIntegerList;
-	}
-	
+	/**
+	 * Gets a list of Rolls from using the Frame list in the BowlingGame. Each Roll objects contains the number of pins knocked down
+	 * by the Roll as well as the Frame Number that the Roll occurred in. The List<Roll> allows for simpler logic and indexing when calculating the
+	 * the Bowling Game's score and determining additional points added by Strikes and Spares.
+	 * @return list of Roll objects
+	 */
 	private List<Roll> getRollList(){
 		List<Roll> rollList = new ArrayList<Roll>();
 		

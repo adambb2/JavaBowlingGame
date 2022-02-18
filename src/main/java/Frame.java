@@ -1,17 +1,17 @@
 import java.util.ArrayList;
-import java.util.List;
 
 public class Frame {
 	
 	private Integer firstBallPinCount = null;
 	
-	private Integer secondBallPinCount = null; //second ball only occurs if a strike was NOT rolled on the first ball..  OR if it is the 10th frame
+	private Integer secondBallPinCount = null;
 	
-	private Integer fillBallPinCount = null; //a fill ball is given if a strike of spare occurs on the 10th frame
+	private Integer fillBallPinCount = null;
 	
 	
 	/**
-	 * @return the pins knocked down by each roll in oder as an IntegerList
+	 * Get number of pins knocked down by each roll in the frame as an ordered Integer ArrayList
+	 * @return pins list
 	 */
 	public ArrayList<Integer> getFrameToIntegerList() {
 		ArrayList<Integer> ballPinsList = new ArrayList<Integer>();
@@ -29,7 +29,8 @@ public class Frame {
 	}
 	
 	/**
-	 * Set 1st, 2nd, or fill ball pin count to the number of pins knocked down by the current roll in the frame.
+	 * Set 1st, 2nd, or fill ball pin count to the number of pins knocked down by the current roll in the frame
+	 * depending on which roll is next in the frame
 	 * @param pins
 	 */
 	public void setCurrentBallPinCount(Integer pins) {
@@ -45,10 +46,10 @@ public class Frame {
 	}
 	
 	/**
-	 * Method that gets the pin count for the latest roll has been stored in the frame
-	 * @param pins
+	 * Get the pin count for the most recent roll stored in this frame
+	 * @return most recent ball's pin count
 	 */
-	public Integer getPreviousBallPinCount() {
+	public Integer getRecentBallPinCount() {
 		if(this.firstBallPinCount == null) {
 			return null;
 		}
@@ -61,14 +62,16 @@ public class Frame {
 		return getFillBallPinCount();
 	}
 	
+	/**
+	 * Return a boolean specifying whether rolls have already been recorded for the 1st and 2nd roll in this frame
+	 * @return boolean
+	 */
 	public Boolean firstAndSecondRollComplete(){
 		if(getFirstBallPinCount() != null && getSecondBallPinCount() != null) {
 			return true;
 		}
 		return false;
 	}
-	
-	
 	
 	/**
 	 * @return the firstBallPinCount
