@@ -1,3 +1,5 @@
+**Please note: the unit tests included in this code as well as the requirments specified below were provided to me as part of a code challenge. I completed this code challenge and my code successfully passed all unit tests**
+
 ### Brief
 
 Score a bowling game.
